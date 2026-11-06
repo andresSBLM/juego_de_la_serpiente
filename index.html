@@ -63,12 +63,18 @@
                 terminar_juego();
             } else if((posicion + 1) == 0) {
                 terminar_juego();
+            } else if (posicion_array_actual == ANCHO - 1 || posicion_array_actual == 0) {
+                terminar_juego();
             }
         }
 
         function terminar_juego() {
             alert("Has perdido");
-            pantalla[posicion_array_actual].splice(posicion, 1, texto);
+            if (posicion != ANCHO) {
+                pantalla[posicion_array_actual].splice(posicion, 1, texto);
+            } else {
+                pantalla[posicion_array_actual].splice(posicion, 1);
+            }
             turno = 0;
             direccion = 'norte';
             posicion = POSICION_INICIO;
@@ -77,6 +83,7 @@
         }
 
         function mover() {
+            console.log(posicion_array_actual);
             turno++;
             cargar(pantalla);
             comprobar();
@@ -92,12 +99,14 @@
                     posicion++;  
                     break;
                 case 'este':
-                    pantalla.splice(posicion, 1, texto);
-                    posicion -= 1;
+                    pantalla[posicion_array_actual].splice(posicion, 1, texto);
+                    pantalla[posicion_array_actual - 1][posicion] = prota;
+                    posicion_array_actual--;
                     break;
                 case 'oeste':
-                    pantalla.splice(posicion, 1, texto);
-                    posicion += 1;
+                    pantalla[posicion_array_actual].splice(posicion, 1, texto);
+                    pantalla[posicion_array_actual + 1][posicion] = prota;
+                    posicion_array_actual++;
                     break;
             }
         }
