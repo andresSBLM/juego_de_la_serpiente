@@ -8,3 +8,8 @@ body {
     text-align: center;
     margin-top: 200px;
 }
+
+#principal {
+    display: grid;
+    grid-template-columns: repeat(20, 1fr);
+}

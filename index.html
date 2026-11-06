@@ -14,67 +14,82 @@
     </main>
     <script>
         const MAIN = document.getElementById("principal");
-        const P = document.createElement("p");
         const texto = '*';
+        const prota = "0";
         var pantalla = [];
-        const POSICION_INICIO = 460;
+        const FILAS = 20;
+        const ANCHO = 20;
+        const POSICION_INICIO = 18;
+        const ARRAY_INICIO = 10;
         var posicion = POSICION_INICIO;
         var turno = 0;
         var direccion = 'norte';
+        var posicion_array_actual = ARRAY_INICIO;
 
-        for (let y = 1; y <= 499; y++) {
-            pantalla.push(texto);
+
+        if (pantalla.length == 0) {
+            for (let y = 0; y < FILAS; y++) {
+                var array = [];
+                for (let x = 1; x <= ANCHO; x++) {
+                    array.push(texto);
+                } 
+                const P = document.createElement("p");
+                pantalla.push(array);
+                P.textContent = pantalla[y].join(" ");
+                MAIN.appendChild(P);
+            }
         }
 
-        P.textContent = pantalla.join(" ");
-
-        MAIN.appendChild(P);
+        
 
         function cargar(array) {
             if (turno == 0) {
-                array[posicion] = "0";
+                const INICIO = array[posicion_array_actual];
+                INICIO.splice(posicion, 1, prota);
+                array[posicion_array_actual] = INICIO;
             }
-            P.textContent = pantalla.join(" ");
+            MAIN.innerHTML = '';
+            for (let fila of pantalla) {
+                const P = document.createElement("p");
+                P.textContent = fila.join(" ");
+                MAIN.appendChild(P);
+            }
         }
+        
+    
 
         function comprobar()  {
-            if(pantalla.indexOf("0") == -1) {
-                alert("Has perdido");
-                pantalla.splice(posicion, 1, texto);
-                console.log("0 no esta en pantalla")
+            if (posicion == ANCHO) {
                 terminar_juego();
-            } else if (((posicion + 1)% 25) == 0) {
-                alert("Has perdido");
-                pantalla.splice(posicion, 1, texto);
-                console.log("Has superado un borde");
-                terminar_juego();
-            } else if (posicion > 499) {
-                alert("Has perdido");
-                pantalla.splice(posicion, 1, texto);
-                pantalla.pop();
-                console.log("Llegaste abajo")
+            } else if((posicion + 1) == 0) {
                 terminar_juego();
             }
         }
 
         function terminar_juego() {
+            alert("Has perdido");
+            pantalla[posicion_array_actual].splice(posicion, 1, texto);
             turno = 0;
-            posicion = POSICION_INICIO;
             direccion = 'norte';
+            posicion = POSICION_INICIO;
+            posicion_array_actual = ARRAY_INICIO;
             cargar(pantalla);
         }
 
         function mover() {
+            turno++;
             cargar(pantalla);
             comprobar();
             switch (direccion) {
                 case 'norte':
-                    pantalla.splice(posicion, 1, texto);
-                    posicion -= 25;
+                    pantalla[posicion_array_actual].splice(posicion, 1, texto);
+                    pantalla[posicion_array_actual][posicion - 1] = prota;
+                    posicion--;
                     break;
                 case 'sur':
-                    pantalla.splice(posicion, 1, texto);
-                    posicion += 25;
+                    pantalla[posicion_array_actual].splice(posicion, 1, texto);
+                    pantalla[posicion_array_actual][posicion + 1] = prota;
+                    posicion++;  
                     break;
                 case 'este':
                     pantalla.splice(posicion, 1, texto);
@@ -92,23 +107,27 @@
                 case 'ArrowUp':
                     console.log("Arriba");
                     direccion = 'norte';
+                    turno++;
                     break;
                 case 'ArrowDown':
                     console.log("Abajo");
                     direccion = 'sur';
+                    turno++;
                     break;
                 case 'ArrowLeft':
                     console.log("Izquierda");
                     direccion = 'este';
+                    turno++;
                     break;
                 case 'ArrowRight':
                     console.log("Derecha");
                     direccion = 'oeste';
+                    turno++;
                     break;
             }
         });
 
-        setInterval(mover, 200);
+        setInterval(mover, 500);
 
 
         cargar(pantalla);
