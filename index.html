@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego de la serpiente con javascript</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <main id="principal">
+
+    </main>
+    <script>
+        const MAIN = document.getElementById("principal");
+        const P = document.createElement("p");
+        const texto = '*';
+        var pantalla = [];
+        const POSICION_INICIO = 460;
+        var posicion = POSICION_INICIO;
+        var turno = 0;
+        var direccion = 'norte';
+
+        for (let y = 1; y <= 499; y++) {
+            pantalla.push(texto);
+        }
+
+        P.textContent = pantalla.join(" ");
+
+        MAIN.appendChild(P);
+
+        function cargar(array) {
+            if (turno == 0) {
+                array[posicion] = "0";
+            }
+            P.textContent = pantalla.join(" ");
+        }
+
+        function comprobar()  {
+            if(pantalla.indexOf("0") == -1) {
+                alert("Has perdido");
+                pantalla.splice(posicion, 1, texto);
+                console.log("0 no esta en pantalla")
+                terminar_juego();
+            } else if (((posicion + 1)% 25) == 0) {
+                alert("Has perdido");
+                pantalla.splice(posicion, 1, texto);
+                console.log("Has superado un borde");
+                terminar_juego();
+            } else if (posicion > 499) {
+                alert("Has perdido");
+                pantalla.splice(posicion, 1, texto);
+                pantalla.pop();
+                console.log("Llegaste abajo")
+                terminar_juego();
+            }
+        }
+
+        function terminar_juego() {
+            turno = 0;
+            posicion = POSICION_INICIO;
+            direccion = 'norte';
+            cargar(pantalla);
+        }
+
+        function mover() {
+            cargar(pantalla);
+            comprobar();
+            switch (direccion) {
+                case 'norte':
+                    pantalla.splice(posicion, 1, texto);
+                    posicion -= 25;
+                    break;
+                case 'sur':
+                    pantalla.splice(posicion, 1, texto);
+                    posicion += 25;
+                    break;
+                case 'este':
+                    pantalla.splice(posicion, 1, texto);
+                    posicion -= 1;
+                    break;
+                case 'oeste':
+                    pantalla.splice(posicion, 1, texto);
+                    posicion += 1;
+                    break;
+            }
+        }
+
+        document.addEventListener('keydown', (event) => {
+            switch (event.key) {
+                case 'ArrowUp':
+                    console.log("Arriba");
+                    direccion = 'norte';
+                    break;
+                case 'ArrowDown':
+                    console.log("Abajo");
+                    direccion = 'sur';
+                    break;
+                case 'ArrowLeft':
+                    console.log("Izquierda");
+                    direccion = 'este';
+                    break;
+                case 'ArrowRight':
+                    console.log("Derecha");
+                    direccion = 'oeste';
+                    break;
+            }
+        });
+
+        setInterval(mover, 200);
+
+
+        cargar(pantalla);
+
+
+
+    </script>
+</body>
+
+</html>
