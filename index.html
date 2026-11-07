@@ -38,27 +38,31 @@
         var contador_manzanas = 0;
         var columna_random;
         var posicion_random;
+        var serpiente = [];
+        var posicion_inicial = [posicion_array_actual, posicion];
+        serpiente.push(posicion_inicial);
+        console.log(serpiente);
 
-
-        if (pantalla.length == 0) {
+        function pantalla_nueva() {
+            console.log("Reconstruccion completa de pantalla")
             for (let y = 0; y < FILAS; y++) {
-                var array = [];
+                var fila = [];
                 for (let x = 1; x <= ANCHO; x++) {
-                    array.push(texto);
+                    fila.push(texto);
                 } 
-                pantalla.push(array);
-                
-            }
+                pantalla.push(fila);
+            }  
         }
+        pantalla_nueva();
 
-        
 
-        function cargar(array) {
+
+        function cargar() {
             if (turno == 0) {
-                console.log(posicion_array_actual);
-                const INICIO = array[posicion_array_actual];
-                INICIO.splice(posicion, 1, prota);
-                array[posicion_array_actual] = INICIO;
+                alert("Llega")
+                pantalla[posicion_array_actual].splice(posicion, 1, prota);
+                console.log("Inicio marcado en : " + posicion_array_actual +  " " + posicion);
+                turno++;
             }
             MAIN.innerHTML = '';
             for (let fila = 0; fila < pantalla.length; fila++) {
@@ -77,9 +81,10 @@
                 }    
                 MAIN.appendChild(CONTENEDOR);
             }
-            console.log("Carga correcta");
             turno++;
         }
+
+        cargar();
 
         function generar_manzana() {
             columna_random = ((Math.random()) * (FILAS - 2)).toFixed();
@@ -88,49 +93,80 @@
             pantalla[columna_random].splice(posicion_random, 1, MANZANA);  
             CONTADOR.textContent = contador_manzanas;
             contador_manzanas++;
+        }
 
+        function aumantar_tamaño() {
+            const ULTIMO_ELEMENTO = serpiente[serpiente.length - 1];
+            switch (direccion) {
+                case 'norte':
+                    pantalla[ULTIMO_ELEMENTO[0]].splice(ULTIMO_ELEMENTO[1] + 1, 1, prota);
+                    console.log("Elemento generado en: " + ULTIMO_ELEMENTO[0] + " " + (ULTIMO_ELEMENTO[1] + 1));
+                    const nuevo_elemento = [ULTIMO_ELEMENTO[0], ULTIMO_ELEMENTO[1] + 1];
+                    serpiente.push(nuevo_elemento);
+                    console.log("La nueva serpiente es: " + serpiente);
+                    break;
+                    
+            }
         }
 
         generar_manzana();
         
 
-        function terminar_juego() {
-            alert("Has perdido");
+        function terminar_juego(err) {
+            alert("Has perdido por: " + err);
             turno = 0;
             direccion = 'norte';
             posicion = POSICION_INICIO;
             posicion_array_actual = ARRAY_INICIO - 1;
             pantalla[columna_random].splice(posicion_random, 1 , texto);
             contador_manzanas = 0;
+            posicion_inicial = [posicion_array_actual, posicion]
+            serpiente = [posicion_inicial];
+            pantalla = [];
+            pantalla_nueva();
             generar_manzana();
-            cargar(pantalla);
         }
 
         function mover() {
+
             if (estado == "pausado") {
                 return;
             }
+            console.log("////////SE COMPLETO UN CICLO////////");
             console.log("Fila: "+posicion_array_actual + " Altura: " + posicion + ` ${direccion}`);
             const ARRAY_ACTUAL = pantalla[posicion_array_actual];
+            const ULTIMO_ARRAY = serpiente[serpiente.length - 1];
             var nuevo_array;
             turno++;
-            cargar(pantalla);
+            ARRAY_ACTUAL.splice(ULTIMO_ARRAY[1], 1, texto);
+            cargar();
             switch (direccion) {
 
 
                 case 'norte':
+                    
                     var nueva_posicion = posicion - 1;
                     console.log("Posicion :" + posicion + " " + nueva_posicion)
-                    ARRAY_ACTUAL.splice(posicion, 1, texto);
-                    if (ARRAY_ACTUAL[posicion - 1] == MANZANA ) {
+                    if (ARRAY_ACTUAL[nueva_posicion] == MANZANA ) {
                         generar_manzana();
+                        aumantar_tamaño();
+                    }
+                    console.log("Tienes delante: " + ARRAY_ACTUAL[nueva_posicion]);
+                    if (ARRAY_ACTUAL[nueva_posicion] == prota) {
+                        terminar_juego("Chocaste de frente contigo mismo");
                     }
                     if (nueva_posicion > -1) {
-                        ARRAY_ACTUAL[posicion - 1] = prota;
+                        ARRAY_ACTUAL[nueva_posicion] = prota;
                         posicion--;
-                        cargar(pantalla);
+                        serpiente[0][1]--;
+                        if (serpiente[0] != ULTIMO_ARRAY) {
+                            ULTIMO_ARRAY[1]--;
+                        }
+                        console.log("Primer elemento " + serpiente[0]);
+                        console.log("Ultimo elemento: " + ULTIMO_ARRAY);
+                        cargar();
                     } else {
-                        terminar_juego();
+                        terminar_juego("Te saliste del cuadrado por el norte");
                     }
                     break;
 
@@ -138,16 +174,20 @@
                 case 'sur':
                     var nueva_posicion = posicion + 1;
                     console.log("Posicion :" + posicion + " " + nueva_posicion)
-                    ARRAY_ACTUAL.splice(posicion, 1, texto);
-                    if (ARRAY_ACTUAL[posicion + 1] == MANZANA ) {
+                    if (ARRAY_ACTUAL[nueva_posicion] == MANZANA ) {
                         generar_manzana();
                     }
+                    if (ARRAY_ACTUAL[posicion + 1] == prota) {
+                        terminar_juego("Chocaste contigo mismo por debajo");
+                    }
                     if (nueva_posicion < ANCHO) {
-                        ARRAY_ACTUAL[posicion + 1] = prota;
+                        ARRAY_ACTUAL[nueva_posicion] = prota;
                         posicion++;
-                        cargar(pantalla);
+                        serpiente[0][1]++;
+                        console.log("Primer elemento " + serpiente[0]);
+                        cargar();
                     } else {
-                        terminar_juego();
+                        terminar_juego("Te saliste del limite por el sur");
                     }
                     break;
 
@@ -206,7 +246,9 @@
             }
         });
 
-        setInterval(mover, 200);
+        
+
+        setInterval(mover, 500);
         
         PAUSAR.addEventListener('click', () => {
             estado = (estado == "pausado")? "activo":"pausado";
@@ -220,7 +262,7 @@
         })
 
 
-        cargar(pantalla);
+        
 
 
 
