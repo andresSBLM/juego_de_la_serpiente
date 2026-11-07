@@ -59,7 +59,6 @@
 
         function cargar() {
             if (turno == 0) {
-                alert("Llega")
                 pantalla[posicion_array_actual].splice(posicion, 1, prota);
                 console.log("Inicio marcado en : " + posicion_array_actual +  " " + posicion);
                 turno++;
@@ -135,36 +134,36 @@
             console.log("////////SE COMPLETO UN CICLO////////");
             console.log("Fila: "+posicion_array_actual + " Altura: " + posicion + ` ${direccion}`);
             const ARRAY_ACTUAL = pantalla[posicion_array_actual];
-            const ULTIMO_ARRAY = serpiente[serpiente.length - 1];
+            var ultimo_array = serpiente[serpiente.length - 1];
             var nuevo_array;
             turno++;
-            ARRAY_ACTUAL.splice(ULTIMO_ARRAY[1], 1, texto);
             cargar();
             switch (direccion) {
 
 
                 case 'norte':
-                    
                     var nueva_posicion = posicion - 1;
                     console.log("Posicion :" + posicion + " " + nueva_posicion)
                     if (ARRAY_ACTUAL[nueva_posicion] == MANZANA ) {
                         generar_manzana();
                         aumantar_tamaño();
                     }
-                    console.log("Tienes delante: " + ARRAY_ACTUAL[nueva_posicion]);
                     if (ARRAY_ACTUAL[nueva_posicion] == prota) {
                         terminar_juego("Chocaste de frente contigo mismo");
                     }
+                    console.log("Tienes delante " + ARRAY_ACTUAL[nueva_posicion]);
                     if (nueva_posicion > -1) {
                         ARRAY_ACTUAL[nueva_posicion] = prota;
+                        const NUEVO_ARRAY = [posicion_array_actual, nueva_posicion];
+                        serpiente.unshift(NUEVO_ARRAY);
+                        serpiente.pop();
+                        ultimo_array = serpiente[serpiente.length - 1];
                         posicion--;
                         serpiente[0][1]--;
-                        if (serpiente[0] != ULTIMO_ARRAY) {
-                            ULTIMO_ARRAY[1]--;
-                        }
+                        pantalla[ultimo_array[0]].splice(ultimo_array[1] + 2, 1, texto);
                         console.log("Primer elemento " + serpiente[0]);
-                        console.log("Ultimo elemento: " + ULTIMO_ARRAY);
-                        cargar();
+                        console.log("Ultimo elemento: " + ultimo_array);
+                        cargar(); 
                     } else {
                         terminar_juego("Te saliste del cuadrado por el norte");
                     }
@@ -184,6 +183,9 @@
                         ARRAY_ACTUAL[nueva_posicion] = prota;
                         posicion++;
                         serpiente[0][1]++;
+                        if (serpiente[0] != ultimo_array) {
+                            ultimo_array[1]++;
+                        }
                         console.log("Primer elemento " + serpiente[0]);
                         cargar();
                     } else {
@@ -194,7 +196,6 @@
 
                 case 'este':
                     nuevo_array = posicion_array_actual - 1;
-                    console.log("El array es :" + posicion_array_actual + " " + nuevo_array)
                     ARRAY_ACTUAL.splice(posicion, 1, texto);
                     if (nuevo_array < 0) {
                         terminar_juego(); 
@@ -206,13 +207,16 @@
                     pantalla[posicion_array_actual - 1][posicion] = prota;
                     pantalla[posicion_array_actual].splice(posicion, 1, texto);
                     posicion_array_actual--;
+                    serpiente[0][0]--;
+                    if (serpiente[0] != ultimo_array) {
+                        ultimo_array[1]--;
+                    }
                     cargar();
                     break;
 
 
                 case 'oeste':
                     nuevo_array = posicion_array_actual + 1;
-                    console.log("El array es :" + posicion_array_actual + " " + nuevo_array)
                     ARRAY_ACTUAL.splice(posicion, 1, texto);
                     if (nuevo_array > FILAS - 1) {
                         terminar_juego(); 
@@ -224,6 +228,10 @@
                     pantalla[posicion_array_actual + 1][posicion] = prota;
                     pantalla[posicion_array_actual].splice(posicion, 1, texto);
                     posicion_array_actual++;
+                    serpiente[0][0]++;
+                    if (serpiente[0] != ultimo_array) {
+                        ultimo_array[1]++;
+                    }
                     cargar();
                     break;
             }
@@ -248,7 +256,7 @@
 
         
 
-        setInterval(mover, 500);
+        setInterval(mover, 1000);
         
         PAUSAR.addEventListener('click', () => {
             estado = (estado == "pausado")? "activo":"pausado";
