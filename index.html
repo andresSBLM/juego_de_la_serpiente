@@ -13,9 +13,14 @@
 
     </main>
     <div id="contador"></div>
+    <footer id="pie">
+        <a id="pausar" href="index.html">Pausar</a>
+        <a id="reiniciar" href="index.html">Reiniciar</a>
+    </footer>
     <script>
         const MAIN = document.getElementById("principal");
         const CONTADOR = document.getElementById("contador");
+        const PAUSAR = document.getElementById("pausar");
         const texto = '*';
         const prota = "0";
         const MANZANA = "X";
@@ -29,6 +34,8 @@
         var direccion = 'norte';
         var posicion_array_actual = ARRAY_INICIO - 1;
         var contador_manzanas = 0;
+        var columna_random;
+        var posicion_random;
 
 
         if (pantalla.length == 0) {
@@ -37,10 +44,8 @@
                 for (let x = 1; x <= ANCHO; x++) {
                     array.push(texto);
                 } 
-                const P = document.createElement("p");
                 pantalla.push(array);
-                P.textContent = pantalla[y].join(" ");
-                MAIN.appendChild(P);
+                
             }
         }
 
@@ -54,20 +59,31 @@
                 array[posicion_array_actual] = INICIO;
             }
             MAIN.innerHTML = '';
-            for (let fila of pantalla) {
-                const P = document.createElement("p");
-                P.textContent = fila.join(" ");
-                MAIN.appendChild(P);
+            for (let fila = 0; fila < pantalla.length; fila++) {
+                const CONTENEDOR = document.createElement("div");
+                for (let x = 0; x < ANCHO; x++) {
+                    const P = document.createElement("p");
+                    P.textContent = pantalla[fila][x];
+                    if (P.textContent == "*") {
+                        P.classList.add("texto_normal");
+                    } else if (P.textContent == "0") {
+                        P.classList.add("serpiente");
+                    } else {
+                        P.classList.add("manzana");
+                    }
+                    CONTENEDOR.appendChild(P);
+                }    
+                MAIN.appendChild(CONTENEDOR);
             }
             console.log("Carga correcta");
             turno++;
         }
 
         function generar_manzana() {
-            const COLUMNA_RANDOM = ((Math.random()) * (FILAS - 2)).toFixed();
-            const POSICION_RANDOM = ((Math.random()) * (ANCHO - 2)).toFixed();
-            console.log("fila random " + COLUMNA_RANDOM);
-            pantalla[COLUMNA_RANDOM].splice(POSICION_RANDOM, 1, MANZANA);  
+            columna_random = ((Math.random()) * (FILAS - 2)).toFixed();
+            posicion_random = ((Math.random()) * (ANCHO - 2)).toFixed();
+            console.log("Manzana generada en Fila:" + columna_random + " Posicion: " + posicion_random);
+            pantalla[columna_random].splice(posicion_random, 1, MANZANA);  
             CONTADOR.textContent = contador_manzanas;
             contador_manzanas++;
 
@@ -82,6 +98,9 @@
             direccion = 'norte';
             posicion = POSICION_INICIO;
             posicion_array_actual = ARRAY_INICIO - 1;
+            pantalla[columna_random].splice(posicion_random, 1 , texto);
+            contador_manzanas = 0;
+            generar_manzana();
             cargar(pantalla);
         }
 
@@ -134,15 +153,15 @@
                     ARRAY_ACTUAL.splice(posicion, 1, texto);
                     if (nuevo_array < 0) {
                         terminar_juego(); 
-                    } else {
-                        pantalla[posicion_array_actual - 1][posicion] = prota;
-                        pantalla[posicion_array_actual].splice(posicion, 1, texto);
-                        posicion_array_actual--;
-                        cargar();
+                        break;
                     }
-                    if(nuevo_array > 0 && pantalla[posicion_array_actual - 1][posicion] == MANZANA ) {
+                    if(pantalla[posicion_array_actual - 1][posicion] == MANZANA ) {
                         generar_manzana();
                     }
+                    pantalla[posicion_array_actual - 1][posicion] = prota;
+                    pantalla[posicion_array_actual].splice(posicion, 1, texto);
+                    posicion_array_actual--;
+                    cargar();
                     break;
 
 
@@ -152,15 +171,15 @@
                     ARRAY_ACTUAL.splice(posicion, 1, texto);
                     if (nuevo_array > FILAS - 1) {
                         terminar_juego(); 
-                    } else {
-                        pantalla[posicion_array_actual + 1][posicion] = prota;
-                        pantalla[posicion_array_actual].splice(posicion, 1, texto);
-                        posicion_array_actual++;
-                        cargar();
+                        break;
                     }
-                    if(nuevo_array < (FILAS - 1)  && pantalla[posicion_array_actual + 1][posicion] == MANZANA ) {
+                    if(pantalla[posicion_array_actual + 1][posicion] == MANZANA ) {
                         generar_manzana();
                     }
+                    pantalla[posicion_array_actual + 1][posicion] = prota;
+                    pantalla[posicion_array_actual].splice(posicion, 1, texto);
+                    posicion_array_actual++;
+                    cargar();
                     break;
             }
         }
