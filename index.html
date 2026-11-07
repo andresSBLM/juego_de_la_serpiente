@@ -12,15 +12,17 @@
     <main id="principal">
 
     </main>
-    <div id="contador"></div>
+    <div id="div_contador"><p id="contador"></p></div>
     <footer id="pie">
-        <a id="pausar" href="index.html">Pausar</a>
+        <a id="pausar">Pausar</a>
         <a id="reiniciar" href="index.html">Reiniciar</a>
     </footer>
     <script>
         const MAIN = document.getElementById("principal");
         const CONTADOR = document.getElementById("contador");
         const PAUSAR = document.getElementById("pausar");
+        PAUSAR.classList.add("activo");
+        var estado = "activo";
         const texto = '*';
         const prota = "0";
         const MANZANA = "X";
@@ -105,6 +107,9 @@
         }
 
         function mover() {
+            if (estado == "pausado") {
+                return;
+            }
             console.log("Fila: "+posicion_array_actual + " Altura: " + posicion + ` ${direccion}`);
             const ARRAY_ACTUAL = pantalla[posicion_array_actual];
             var nuevo_array;
@@ -202,6 +207,17 @@
         });
 
         setInterval(mover, 200);
+        
+        PAUSAR.addEventListener('click', () => {
+            estado = (estado == "pausado")? "activo":"pausado";
+            if (estado == "pausado") {
+                PAUSAR.classList.remove("activo");
+                PAUSAR.classList.add("pausado");
+            } else {
+                PAUSAR.classList.remove("pausado");
+                PAUSAR.classList.add("activo");
+            }
+        })
 
 
         cargar(pantalla);
