@@ -12,10 +12,13 @@
     <main id="principal">
 
     </main>
+    <div id="contador"></div>
     <script>
         const MAIN = document.getElementById("principal");
+        const CONTADOR = document.getElementById("contador");
         const texto = '*';
         const prota = "0";
+        const MANZANA = "X";
         var pantalla = [];
         const FILAS = 20;
         const ANCHO = 20;
@@ -24,7 +27,8 @@
         var posicion = POSICION_INICIO;
         var turno = 0;
         var direccion = 'norte';
-        var posicion_array_actual = ARRAY_INICIO;
+        var posicion_array_actual = ARRAY_INICIO - 1;
+        var contador_manzanas = 0;
 
 
         if (pantalla.length == 0) {
@@ -44,6 +48,7 @@
 
         function cargar(array) {
             if (turno == 0) {
+                console.log(posicion_array_actual);
                 const INICIO = array[posicion_array_actual];
                 INICIO.splice(posicion, 1, prota);
                 array[posicion_array_actual] = INICIO;
@@ -54,59 +59,108 @@
                 P.textContent = fila.join(" ");
                 MAIN.appendChild(P);
             }
+            console.log("Carga correcta");
+            turno++;
         }
-        
-    
 
-        function comprobar()  {
-            if (posicion == ANCHO) {
-                terminar_juego();
-            } else if((posicion + 1) == 0) {
-                terminar_juego();
-            } else if (posicion_array_actual == ANCHO - 1 || posicion_array_actual == 0) {
-                terminar_juego();
-            }
+        function generar_manzana() {
+            const COLUMNA_RANDOM = ((Math.random()) * (FILAS - 2)).toFixed();
+            const POSICION_RANDOM = ((Math.random()) * (ANCHO - 2)).toFixed();
+            console.log("fila random " + COLUMNA_RANDOM);
+            pantalla[COLUMNA_RANDOM].splice(POSICION_RANDOM, 1, MANZANA);  
+            CONTADOR.textContent = contador_manzanas;
+            contador_manzanas++;
+
         }
+
+        generar_manzana();
+        
 
         function terminar_juego() {
             alert("Has perdido");
-            if (posicion != ANCHO) {
-                pantalla[posicion_array_actual].splice(posicion, 1, texto);
-            } else {
-                pantalla[posicion_array_actual].splice(posicion, 1);
-            }
             turno = 0;
             direccion = 'norte';
             posicion = POSICION_INICIO;
-            posicion_array_actual = ARRAY_INICIO;
+            posicion_array_actual = ARRAY_INICIO - 1;
             cargar(pantalla);
         }
 
         function mover() {
-            console.log(posicion_array_actual);
+            console.log("Fila: "+posicion_array_actual + " Altura: " + posicion + ` ${direccion}`);
+            const ARRAY_ACTUAL = pantalla[posicion_array_actual];
+            var nuevo_array;
             turno++;
             cargar(pantalla);
-            comprobar();
             switch (direccion) {
+
+
                 case 'norte':
-                    pantalla[posicion_array_actual].splice(posicion, 1, texto);
-                    pantalla[posicion_array_actual][posicion - 1] = prota;
-                    posicion--;
+                    var nueva_posicion = posicion - 1;
+                    console.log("Posicion :" + posicion + " " + nueva_posicion)
+                    ARRAY_ACTUAL.splice(posicion, 1, texto);
+                    if (ARRAY_ACTUAL[posicion - 1] == MANZANA ) {
+                        generar_manzana();
+                    }
+                    if (nueva_posicion > -1) {
+                        ARRAY_ACTUAL[posicion - 1] = prota;
+                        posicion--;
+                        cargar(pantalla);
+                    } else {
+                        terminar_juego();
+                    }
                     break;
+
+
                 case 'sur':
-                    pantalla[posicion_array_actual].splice(posicion, 1, texto);
-                    pantalla[posicion_array_actual][posicion + 1] = prota;
-                    posicion++;  
+                    var nueva_posicion = posicion + 1;
+                    console.log("Posicion :" + posicion + " " + nueva_posicion)
+                    ARRAY_ACTUAL.splice(posicion, 1, texto);
+                    if (ARRAY_ACTUAL[posicion + 1] == MANZANA ) {
+                        generar_manzana();
+                    }
+                    if (nueva_posicion < ANCHO) {
+                        ARRAY_ACTUAL[posicion + 1] = prota;
+                        posicion++;
+                        cargar(pantalla);
+                    } else {
+                        terminar_juego();
+                    }
                     break;
+
+
                 case 'este':
-                    pantalla[posicion_array_actual].splice(posicion, 1, texto);
-                    pantalla[posicion_array_actual - 1][posicion] = prota;
-                    posicion_array_actual--;
+                    nuevo_array = posicion_array_actual - 1;
+                    console.log("El array es :" + posicion_array_actual + " " + nuevo_array)
+                    ARRAY_ACTUAL.splice(posicion, 1, texto);
+                    if (nuevo_array < 0) {
+                        terminar_juego(); 
+                    } else {
+                        pantalla[posicion_array_actual - 1][posicion] = prota;
+                        pantalla[posicion_array_actual].splice(posicion, 1, texto);
+                        posicion_array_actual--;
+                        cargar();
+                    }
+                    if(nuevo_array > 0 && pantalla[posicion_array_actual - 1][posicion] == MANZANA ) {
+                        generar_manzana();
+                    }
                     break;
+
+
                 case 'oeste':
-                    pantalla[posicion_array_actual].splice(posicion, 1, texto);
-                    pantalla[posicion_array_actual + 1][posicion] = prota;
-                    posicion_array_actual++;
+                    nuevo_array = posicion_array_actual + 1;
+                    console.log("El array es :" + posicion_array_actual + " " + nuevo_array)
+                    ARRAY_ACTUAL.splice(posicion, 1, texto);
+                    if (nuevo_array > FILAS - 1) {
+                        terminar_juego(); 
+                    } else {
+                        pantalla[posicion_array_actual + 1][posicion] = prota;
+                        pantalla[posicion_array_actual].splice(posicion, 1, texto);
+                        posicion_array_actual++;
+                        cargar();
+                    }
+                    if(nuevo_array < (FILAS - 1)  && pantalla[posicion_array_actual + 1][posicion] == MANZANA ) {
+                        generar_manzana();
+                    }
                     break;
             }
         }
@@ -114,32 +168,25 @@
         document.addEventListener('keydown', (event) => {
             switch (event.key) {
                 case 'ArrowUp':
-                    console.log("Arriba");
                     direccion = 'norte';
-                    turno++;
                     break;
                 case 'ArrowDown':
-                    console.log("Abajo");
                     direccion = 'sur';
-                    turno++;
                     break;
                 case 'ArrowLeft':
-                    console.log("Izquierda");
                     direccion = 'este';
-                    turno++;
                     break;
                 case 'ArrowRight':
-                    console.log("Derecha");
                     direccion = 'oeste';
-                    turno++;
                     break;
             }
         });
 
-        setInterval(mover, 500);
+        setInterval(mover, 200);
 
 
         cargar(pantalla);
+
 
 
 

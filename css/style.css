@@ -7,9 +7,23 @@ body {
     margin: auto;
     text-align: center;
     margin-top: 200px;
+    background-color: rgb(158, 243, 158);
 }
 
 #principal {
     display: grid;
     grid-template-columns: repeat(20, 1fr);
+    font-weight: bold;
+    background-color: aliceblue;
+}
+
+#contador {
+    margin-top: 30px;
+    padding: 10px;
+    font-size: 2rem;
+    font-weight: bold;
+    background: repeating-conic-gradient(rgba(255, 255, 255, 0.236) 0% 25%, rgba(0, 0, 0, 0.285) 0% 50%) 0 0 / 30px 30px;
+    border-radius: 10px;
+    color: rgb(0, 0, 0);
+    text-shadow: 2px 2px 2px rgb(66, 252, 4);
 }
