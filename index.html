@@ -23,6 +23,7 @@
         const PAUSAR = document.getElementById("pausar");
         PAUSAR.classList.add("activo");
         var estado = "activo";
+        const VELOCIDAD = 100;
         const texto = '*';
         const prota = "0";
         const MANZANA = "X";
@@ -36,6 +37,7 @@
         var direccion = 'norte';
         var posicion_array_actual = ARRAY_INICIO - 1;
         var contador_manzanas = 0;
+        const CANTIDAD_MANZANAS = 50;
         var columna_random;
         var posicion_random;
         var serpiente = [];
@@ -85,30 +87,31 @@
 
         cargar();
 
-        function generar_manzana() {
-            columna_random = ((Math.random()) * (FILAS - 2)).toFixed();
-            posicion_random = ((Math.random()) * (ANCHO - 2)).toFixed();
-            console.log("Manzana generada en Fila:" + columna_random + " Posicion: " + posicion_random);
-            pantalla[columna_random].splice(posicion_random, 1, MANZANA);  
+        function generar_manzanas(cantidad) {
             CONTADOR.textContent = contador_manzanas;
-            contador_manzanas++;
-        }
-
-        function aumantar_tamaño() {
-            const ULTIMO_ELEMENTO = serpiente[serpiente.length - 1];
-            switch (direccion) {
-                case 'norte':
-                    pantalla[ULTIMO_ELEMENTO[0]].splice(ULTIMO_ELEMENTO[1] + 1, 1, prota);
-                    console.log("Elemento generado en: " + ULTIMO_ELEMENTO[0] + " " + (ULTIMO_ELEMENTO[1] + 1));
-                    const nuevo_elemento = [ULTIMO_ELEMENTO[0], ULTIMO_ELEMENTO[1] + 1];
-                    serpiente.push(nuevo_elemento);
-                    console.log("La nueva serpiente es: " + serpiente);
-                    break;
-                    
+            for (let x = 0; x < cantidad; x++) {
+                columna_random = ((Math.random()) * (FILAS - 2)).toFixed();
+                posicion_random = ((Math.random()) * (ANCHO - 2)).toFixed();
+                const PANTALLA_RANDOM = pantalla[columna_random][posicion_random];
+                if (PANTALLA_RANDOM == prota || PANTALLA_RANDOM == MANZANA) {
+                    generar_manzanas(1);
+                } else {
+                    console.log("Manzana generada en Fila:" + columna_random + " Posicion: " + posicion_random);
+                    pantalla[columna_random].splice(posicion_random, 1, MANZANA);  
+                }
             }
         }
 
-        generar_manzana();
+        generar_manzanas(CANTIDAD_MANZANAS);
+
+        function aumantar_tamaño() {
+            const ULTIMO_ELEMENTO = serpiente[serpiente.length - 1];
+                pantalla[ULTIMO_ELEMENTO[0]].splice(ULTIMO_ELEMENTO[1], 1, prota);
+                console.log("Elemento generado en: " + ULTIMO_ELEMENTO[0] + " " + (ULTIMO_ELEMENTO[1]));
+                var nuevo_elemento = [ULTIMO_ELEMENTO[0], ULTIMO_ELEMENTO[1]];
+                serpiente.push(nuevo_elemento);
+                console.log("La nueva serpiente es: " + serpiente);    
+            }
         
 
         function terminar_juego(err) {
@@ -123,7 +126,7 @@
             serpiente = [posicion_inicial];
             pantalla = [];
             pantalla_nueva();
-            generar_manzana();
+            generar_manzanas(CANTIDAD_MANZANAS);
         }
 
         function mover() {
@@ -138,6 +141,8 @@
             var nuevo_array;
             turno++;
             cargar();
+            ultimo_array = serpiente[serpiente.length - 1];
+            pantalla[ultimo_array[0]].splice(ultimo_array[1], 1, texto);
             switch (direccion) {
 
 
@@ -145,22 +150,21 @@
                     var nueva_posicion = posicion - 1;
                     console.log("Posicion :" + posicion + " " + nueva_posicion)
                     if (ARRAY_ACTUAL[nueva_posicion] == MANZANA ) {
-                        generar_manzana();
+                        generar_manzanas(1);
+                        contador_manzanas++;
+                        CONTADOR.textContent = contador_manzanas;
                         aumantar_tamaño();
                     }
                     if (ARRAY_ACTUAL[nueva_posicion] == prota) {
                         terminar_juego("Chocaste de frente contigo mismo");
+                        break;
                     }
-                    console.log("Tienes delante " + ARRAY_ACTUAL[nueva_posicion]);
                     if (nueva_posicion > -1) {
                         ARRAY_ACTUAL[nueva_posicion] = prota;
                         const NUEVO_ARRAY = [posicion_array_actual, nueva_posicion];
                         serpiente.unshift(NUEVO_ARRAY);
                         serpiente.pop();
-                        ultimo_array = serpiente[serpiente.length - 1];
                         posicion--;
-                        serpiente[0][1]--;
-                        pantalla[ultimo_array[0]].splice(ultimo_array[1] + 2, 1, texto);
                         console.log("Primer elemento " + serpiente[0]);
                         console.log("Ultimo elemento: " + ultimo_array);
                         cargar(); 
@@ -174,20 +178,24 @@
                     var nueva_posicion = posicion + 1;
                     console.log("Posicion :" + posicion + " " + nueva_posicion)
                     if (ARRAY_ACTUAL[nueva_posicion] == MANZANA ) {
-                        generar_manzana();
+                        generar_manzanas(1);
+                        contador_manzanas++;
+                        CONTADOR.textContent = contador_manzanas;
+                        aumantar_tamaño();
                     }
-                    if (ARRAY_ACTUAL[posicion + 1] == prota) {
+                    if (ARRAY_ACTUAL[nueva_posicion] == prota) {
                         terminar_juego("Chocaste contigo mismo por debajo");
+                        break;
                     }
                     if (nueva_posicion < ANCHO) {
                         ARRAY_ACTUAL[nueva_posicion] = prota;
+                        const NUEVO_ARRAY = [posicion_array_actual, nueva_posicion];
+                        serpiente.unshift(NUEVO_ARRAY);
+                        serpiente.pop();
                         posicion++;
-                        serpiente[0][1]++;
-                        if (serpiente[0] != ultimo_array) {
-                            ultimo_array[1]++;
-                        }
                         console.log("Primer elemento " + serpiente[0]);
-                        cargar();
+                        console.log("Ultimo elemento: " + ultimo_array);
+                        cargar(); 
                     } else {
                         terminar_juego("Te saliste del limite por el sur");
                     }
@@ -195,43 +203,55 @@
 
 
                 case 'este':
-                    nuevo_array = posicion_array_actual - 1;
-                    ARRAY_ACTUAL.splice(posicion, 1, texto);
-                    if (nuevo_array < 0) {
-                        terminar_juego(); 
+                    pos_nuevo_array = posicion_array_actual - 1;
+                    if (pos_nuevo_array < 0) {
+                        terminar_juego("Te chocaste contra la pared izquierda."); 
                         break;
                     }
-                    if(pantalla[posicion_array_actual - 1][posicion] == MANZANA ) {
-                        generar_manzana();
+                    if(pantalla[pos_nuevo_array][posicion] == MANZANA ) {
+                        generar_manzanas(1);
+                        contador_manzanas++;
+                        CONTADOR.textContent = contador_manzanas;
+                        aumantar_tamaño();
                     }
-                    pantalla[posicion_array_actual - 1][posicion] = prota;
-                    pantalla[posicion_array_actual].splice(posicion, 1, texto);
+                    if (pantalla[pos_nuevo_array][posicion] == prota) {
+                        terminar_juego("Chocaste de lado contigo mismo");
+                        break;
+                    }
+                    pantalla[pos_nuevo_array][posicion] = prota;
+                    const NUEVO_ARRAY = [pos_nuevo_array, posicion];
+                    serpiente.unshift(NUEVO_ARRAY);
+                    serpiente.pop();
                     posicion_array_actual--;
-                    serpiente[0][0]--;
-                    if (serpiente[0] != ultimo_array) {
-                        ultimo_array[1]--;
-                    }
+                    console.log("Primer elemento " + serpiente[0]);
+                    console.log("Ultimo elemento: " + ultimo_array);
                     cargar();
                     break;
 
 
                 case 'oeste':
-                    nuevo_array = posicion_array_actual + 1;
-                    ARRAY_ACTUAL.splice(posicion, 1, texto);
-                    if (nuevo_array > FILAS - 1) {
+                    pos_nuevo_array = posicion_array_actual + 1;
+                    if (pos_nuevo_array > FILAS - 1) {
                         terminar_juego(); 
                         break;
                     }
-                    if(pantalla[posicion_array_actual + 1][posicion] == MANZANA ) {
-                        generar_manzana();
+                    if(pantalla[pos_nuevo_array][posicion] == MANZANA ) {
+                        generar_manzanas(1);
+                        contador_manzanas++;
+                        CONTADOR.textContent = contador_manzanas;
+                        aumantar_tamaño();
                     }
-                    pantalla[posicion_array_actual + 1][posicion] = prota;
-                    pantalla[posicion_array_actual].splice(posicion, 1, texto);
+                    if (pantalla[pos_nuevo_array][posicion] == prota) {
+                        terminar_juego("Chocaste de lado contigo mismo");
+                        break;
+                    }
+                    pantalla[pos_nuevo_array][posicion] = prota;
+                    const NUEVO_ARRAY_OESTE = [pos_nuevo_array, posicion];
+                    serpiente.unshift(NUEVO_ARRAY_OESTE);
+                    serpiente.pop();
                     posicion_array_actual++;
-                    serpiente[0][0]++;
-                    if (serpiente[0] != ultimo_array) {
-                        ultimo_array[1]++;
-                    }
+                    console.log("Primer elemento " + serpiente[0]);
+                    console.log("Ultimo elemento: " + ultimo_array);
                     cargar();
                     break;
             }
@@ -256,7 +276,7 @@
 
         
 
-        setInterval(mover, 1000);
+        setInterval(mover, VELOCIDAD);
         
         PAUSAR.addEventListener('click', () => {
             estado = (estado == "pausado")? "activo":"pausado";
