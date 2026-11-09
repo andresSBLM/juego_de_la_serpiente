@@ -24,8 +24,8 @@
         PAUSAR.classList.add("activo");
         var estado = "activo";
         const VELOCIDAD = 100;
-        const texto = '*';
-        const prota = "0";
+        const TEXTO = '*';
+        const PROTA = "0";
         const MANZANA = "X";
         var pantalla = [];
         const FILAS = 20;
@@ -37,7 +37,7 @@
         var direccion = 'norte';
         var posicion_array_actual = ARRAY_INICIO - 1;
         var contador_manzanas = 0;
-        const CANTIDAD_MANZANAS = 50;
+        const CANTIDAD_MANZANAS = 10;
         var columna_random;
         var posicion_random;
         var serpiente = [];
@@ -50,7 +50,7 @@
             for (let y = 0; y < FILAS; y++) {
                 var fila = [];
                 for (let x = 1; x <= ANCHO; x++) {
-                    fila.push(texto);
+                    fila.push(TEXTO);
                 } 
                 pantalla.push(fila);
             }  
@@ -61,7 +61,7 @@
 
         function cargar() {
             if (turno == 0) {
-                pantalla[posicion_array_actual].splice(posicion, 1, prota);
+                pantalla[posicion_array_actual].splice(posicion, 1, PROTA);
                 console.log("Inicio marcado en : " + posicion_array_actual +  " " + posicion);
                 turno++;
             }
@@ -93,7 +93,7 @@
                 columna_random = ((Math.random()) * (FILAS - 2)).toFixed();
                 posicion_random = ((Math.random()) * (ANCHO - 2)).toFixed();
                 const PANTALLA_RANDOM = pantalla[columna_random][posicion_random];
-                if (PANTALLA_RANDOM == prota || PANTALLA_RANDOM == MANZANA) {
+                if (PANTALLA_RANDOM == PROTA || PANTALLA_RANDOM == MANZANA) {
                     generar_manzanas(1);
                 } else {
                     console.log("Manzana generada en Fila:" + columna_random + " Posicion: " + posicion_random);
@@ -106,7 +106,7 @@
 
         function aumantar_tamaño() {
             const ULTIMO_ELEMENTO = serpiente[serpiente.length - 1];
-                pantalla[ULTIMO_ELEMENTO[0]].splice(ULTIMO_ELEMENTO[1], 1, prota);
+                pantalla[ULTIMO_ELEMENTO[0]].splice(ULTIMO_ELEMENTO[1], 1, PROTA);
                 console.log("Elemento generado en: " + ULTIMO_ELEMENTO[0] + " " + (ULTIMO_ELEMENTO[1]));
                 var nuevo_elemento = [ULTIMO_ELEMENTO[0], ULTIMO_ELEMENTO[1]];
                 serpiente.push(nuevo_elemento);
@@ -120,7 +120,7 @@
             direccion = 'norte';
             posicion = POSICION_INICIO;
             posicion_array_actual = ARRAY_INICIO - 1;
-            pantalla[columna_random].splice(posicion_random, 1 , texto);
+            pantalla[columna_random].splice(posicion_random, 1 , TEXTO);
             contador_manzanas = 0;
             posicion_inicial = [posicion_array_actual, posicion]
             serpiente = [posicion_inicial];
@@ -142,7 +142,7 @@
             turno++;
             cargar();
             ultimo_array = serpiente[serpiente.length - 1];
-            pantalla[ultimo_array[0]].splice(ultimo_array[1], 1, texto);
+            pantalla[ultimo_array[0]].splice(ultimo_array[1], 1, TEXTO);
             switch (direccion) {
 
 
@@ -155,12 +155,12 @@
                         CONTADOR.textContent = contador_manzanas;
                         aumantar_tamaño();
                     }
-                    if (ARRAY_ACTUAL[nueva_posicion] == prota) {
+                    if (ARRAY_ACTUAL[nueva_posicion] == PROTA) {
                         terminar_juego("Chocaste de frente contigo mismo");
                         break;
                     }
                     if (nueva_posicion > -1) {
-                        ARRAY_ACTUAL[nueva_posicion] = prota;
+                        ARRAY_ACTUAL[nueva_posicion] = PROTA;
                         const NUEVO_ARRAY = [posicion_array_actual, nueva_posicion];
                         serpiente.unshift(NUEVO_ARRAY);
                         serpiente.pop();
@@ -183,12 +183,12 @@
                         CONTADOR.textContent = contador_manzanas;
                         aumantar_tamaño();
                     }
-                    if (ARRAY_ACTUAL[nueva_posicion] == prota) {
+                    if (ARRAY_ACTUAL[nueva_posicion] == PROTA) {
                         terminar_juego("Chocaste contigo mismo por debajo");
                         break;
                     }
                     if (nueva_posicion < ANCHO) {
-                        ARRAY_ACTUAL[nueva_posicion] = prota;
+                        ARRAY_ACTUAL[nueva_posicion] = PROTA;
                         const NUEVO_ARRAY = [posicion_array_actual, nueva_posicion];
                         serpiente.unshift(NUEVO_ARRAY);
                         serpiente.pop();
@@ -214,11 +214,11 @@
                         CONTADOR.textContent = contador_manzanas;
                         aumantar_tamaño();
                     }
-                    if (pantalla[pos_nuevo_array][posicion] == prota) {
+                    if (pantalla[pos_nuevo_array][posicion] == PROTA) {
                         terminar_juego("Chocaste de lado contigo mismo");
                         break;
                     }
-                    pantalla[pos_nuevo_array][posicion] = prota;
+                    pantalla[pos_nuevo_array][posicion] = PROTA;
                     const NUEVO_ARRAY = [pos_nuevo_array, posicion];
                     serpiente.unshift(NUEVO_ARRAY);
                     serpiente.pop();
@@ -241,11 +241,11 @@
                         CONTADOR.textContent = contador_manzanas;
                         aumantar_tamaño();
                     }
-                    if (pantalla[pos_nuevo_array][posicion] == prota) {
+                    if (pantalla[pos_nuevo_array][posicion] == PROTA) {
                         terminar_juego("Chocaste de lado contigo mismo");
                         break;
                     }
-                    pantalla[pos_nuevo_array][posicion] = prota;
+                    pantalla[pos_nuevo_array][posicion] = PROTA;
                     const NUEVO_ARRAY_OESTE = [pos_nuevo_array, posicion];
                     serpiente.unshift(NUEVO_ARRAY_OESTE);
                     serpiente.pop();
@@ -260,17 +260,23 @@
         document.addEventListener('keydown', (event) => {
             switch (event.key) {
                 case 'ArrowUp':
+                    case "w":
                     direccion = 'norte';
                     break;
                 case 'ArrowDown':
+                case 's':
                     direccion = 'sur';
                     break;
                 case 'ArrowLeft':
+                case 'a':
                     direccion = 'este';
                     break;
                 case 'ArrowRight':
+                case 'd':
                     direccion = 'oeste';
                     break;
+                case ' ':
+                    estado = (estado == "pausado") ? "activo" : "pausado";
             }
         });
 
